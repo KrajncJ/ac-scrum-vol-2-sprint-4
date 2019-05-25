@@ -1,0 +1,55 @@
+extends layout
+
+block content
+
+    main.container(role="main")
+        script(type='text/javascript', src='https://cdn.jsdelivr.net/npm/jdenticon@2.1.1')
+
+        .container.theme-showcase
+            .page-header
+
+                h3.ml-3 #{project.name} - Wall
+
+            .container
+                nav.navbar.navbar-expand-lg.navbar-light.bg-light
+                    ul.navbar-nav.mr-auto
+                        li.nav-item
+                        if project
+                            a.nav-link(href='/projects/' + project.id + '/view')
+                                i.fas.fa-chevron-left
+                                |  Back
+                hr
+            div.main.container
+                .row
+                    if errorMessages !== 0
+                        .col-md-12.col-md-offset-0.margin-top20
+                            .alert.alert-danger(role="alert")
+                                h4.alert-heading #{errorMessages}
+                                p Something went wrong. Please check if your form is correct or if this project name already exists - otherwise try later or contact application administrator.
+
+                    if success !== 0
+                        .col-md-12.col-md-offset-0.margin-top20
+                            .alert.alert-success(role="alert")
+                                h4.alert-heading Success.
+                                p #{success}.
+
+                    div.col-md-9.col-md-offset-0.margin-center.margin-top20
+                        div.panel-body.overflow-auto.mb-5.pb-5
+                            ul.list-unstyled
+
+                            each comment in comments
+                                li.media.mb-1
+                                    svg(width='65', height='65', style="margin-right:1rem;" data-jdenticon-value=''+comment.Owner.id)
+                                    .media-body
+                                        h5.mt-0.mb-0 #{comment.Owner.name}
+                                        | #{comment.text}
+                                        br
+                                        small #{moment(comment.createdAt).format('DD.MM.YYYY HH:mm')}
+                                hr
+
+                            form.well.form-horizontal(method='POST' action=('/projects/'+ project.id + '/wall/#inputComment'))
+                                .input-group.mb-3.mt-3
+                                    textarea.form-control(type='text',id="inputComment" name='comment',rows="5" placeholder="Type a comment", aria-label="comment", aria-describedby='button-addon2')
+                                    .input-group-append
+                                        button#button-addon2.btn.btn-outline-secondary(type='submit') Post
+

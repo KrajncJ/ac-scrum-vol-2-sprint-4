@@ -23,6 +23,9 @@ block content
                                 if !isUser || project.scrum_master == uid
                                     li.nav-item
                                         a.nav-link(href='/projects/'+ project.id + '/edit') Edit Project
+                                    li.nav-item
+                                        a.nav-link(href='/projects/' + project.id + '/wall') Project Wall
+
                     hr
 
                 div.main.container

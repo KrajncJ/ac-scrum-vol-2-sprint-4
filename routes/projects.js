@@ -9,6 +9,7 @@ var middleware = require('./middleware.js');
 var User = models.User;
 var Projects = models.Project;
 var UserProject = models.UserProject;
+var Comment = models.Comment;
 
 // helpers
 var ProjectHelper = require('../helpers/ProjectHelper');
@@ -170,6 +171,46 @@ router.post('/create/', middleware.isAllowed, async function(req, res, next) {
             username: req.user.username, isUser: req.user.is_user });
 
     }
+
+});
+
+
+
+router.get('/:id/wall/', middleware.isAllowed, async function(req, res, next) {
+
+    let project = await Projects.findById(req.params.id);
+
+
+    let comments = await Comment.findAll({
+        where: {
+            project_id: req.params.id,
+        },
+        include: [
+            {
+                model: models.User,
+                as: 'Owner',
+                attributes: ['name', 'id'],
+            },
+        ],
+        order: [
+            ['createdAt', 'ASC'],
+        ],
+    })
+    res.render('project_wall', { errorMessages: 0,
+        pageName: 'project_wall', project: project, comments:comments, username: req.user.username,
+        isUser: req.user.is_user, success: 0 });
+});
+
+router.post('/:id/wall/', middleware.isAllowed, async function(req, res, next) {
+    var data = req.body;
+    let comm =  await Comment.create({
+        text: data.comment,
+        created_by: req.user.id,
+        project_id: req.params.id,
+    });
+    await comm.save();
+
+    return res.redirect('/projects/' + req.params.id + '/wall');
 
 });
 
