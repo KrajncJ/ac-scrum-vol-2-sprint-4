@@ -1,6 +1,4 @@
-# Ac_scrum_vol2 - projekt pri predmetu SMRPO na FRI, 2019
-* oddaja 3, 08.05.2019
-* Skupina S1(5): Nermin Jukan, Ladislav Škufca, Jakob Turk, Matija Volontar
+
 
 # How to install
 
