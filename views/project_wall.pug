@@ -35,6 +35,9 @@ block content
 
                     div.col-md-9.col-md-offset-0.margin-center.margin-top20
                         div.panel-body.overflow-auto.mb-5.pb-5
+                            if comments.length == 0
+                                p No comments yet on Project Wall
+                                hr
                             ul.list-unstyled
 
                             each comment in comments
