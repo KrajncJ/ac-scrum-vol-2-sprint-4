@@ -1,0 +1,62 @@
+extends layout
+
+block content
+
+    main.container(role="main")
+        .container.theme-showcase
+            .page-header
+                if toEditDoc
+                   h3 Edit document
+                if !toEditDoc
+                    h3 Add document
+
+                .container
+                    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+                        ul.navbar-nav.mr-auto
+                            li.nav-item
+                                a.nav-link(href='/projects/'+ project.id + '/documentation')
+                                    |  Back
+                hr
+            div.main.container
+                .row
+                    if errorMessages !== 0
+                        .col-md-12.col-md-offset-0.margin-top20
+                            .alert.alert-danger(role="alert")
+                                h4.alert-heading #{errorMessages}
+                                p Something went wrong. Please check if your form is correct or if this project name already exists - otherwise try later or contact application administrator.
+
+                    if success !== 0
+                        .col-md-12.col-md-offset-0.margin-top20
+                            .alert.alert-success(role="alert")
+                                h4.alert-heading Success.
+                                p #{success}.
+
+                    div.col-md-9.col-md-offset-0.margin-center.margin-top20
+                        div.panel-body
+                            div
+                                form.well.form-horizontal(method='POST' action=(toEditDoc ? '/projects/'+ project.id + '/documentation/' + toEditDoc.id + '/edit/' : '/projects/'+ project.id + '/documentation/create'))#document_form
+                                    div.panel-body
+                                        div.col-md-12.col-md-offset-0
+                                            div.form-group
+                                                label(for='doc_name') Document name:
+                                                input#doc_name.form-control(type='text' placeholder='Enter Name' name='doc_name' value=(toEditDoc ? toEditDoc.name : '') )
+                                            div.form-group
+                                              <textarea name="doc_body" id="document"></textarea>
+                                            if !toEditDoc
+                                                span#docVal(hidden="")
+                                                button.btn.btn-primary.center-block.margin-top20#registerBtn(type='submit') Create
+                                            if toEditDoc
+                                                span#docVal(hidden="") #{toEditDoc.text}
+                                                button.btn.btn-primary.center-block.margin-top20#registerBtn(type='submit') Update
+
+
+
+    script.
+        var simplemde = new SimpleMDE({
+            element: document.getElementById("document"),
+        });
+        
+        var span_Text = document.getElementById("docVal").innerText;
+        if(span_Text !== "") {
+          simplemde.value(span_Text)
+        }

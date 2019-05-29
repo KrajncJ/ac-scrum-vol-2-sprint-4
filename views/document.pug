@@ -1,0 +1,75 @@
+extends layout
+
+block content
+
+    main.container(role="main")
+        .container.theme-showcase
+            .page-header
+                h3 #{document.name}
+
+                .container
+                    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+                        ul.navbar-nav.mr-auto
+                            li.nav-item
+                                a.nav-link(href='/projects/'+ project.id + '/documentation')
+                                    |  Back
+                            li.nav-item
+                                a.nav-link(href='/projects/'+ project.id + '/documentation/' + document.id + '/edit')
+                                    |  Edit
+                            li.nav-item
+                                a.nav-link#export(href='')
+                                    |  Export
+                hr
+            div.main.container
+                .row
+                    div.col-md-9.col-md-offset-0.margin-center.margin-top20
+                        div.panel-body
+                            div
+                                div.panel-body
+                                    div.col-md-12.col-md-offset-0
+                                        textarea#document
+                                        span#docVal(hidden='') #{document.text}
+
+    script.
+        var simplemde = new SimpleMDE({
+            element: document.getElementById("document"),
+            toolbar: false,
+            toolbarTips: false,
+            status: false,
+        });
+        simplemde.value(`#{document.text}`);
+        simplemde.togglePreview();
+
+        
+        var button = document.getElementById('export');
+        button.addEventListener('click', saveTextAsFile);
+        
+        function saveTextAsFile()
+        {
+            var textToWrite = simplemde.value();
+            var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+            var fileNameToSaveAs = "#{document.name}.md";
+        
+            var downloadLink = document.createElement("a");
+            downloadLink.download = fileNameToSaveAs;
+            downloadLink.innerHTML = "Download File";
+            if (window.webkitURL != null)
+            {
+                // Chrome allows the link to be clicked
+                // without actually adding it to the DOM.
+                downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+            }
+            else
+            {
+                // Firefox requires the link to be added to the DOM
+                // before it can be clicked.
+                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+                downloadLink.onclick = function(){
+                	document.body.removeChild(downloadLink);
+                };
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+            }
+        
+            downloadLink.click();
+        }

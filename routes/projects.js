@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var moment = require('moment');
+var formidable = require('formidable');
+var util = require('util')
+var fs = require('fs');
 
 var models = require('../models/');
 var middleware = require('./middleware.js');
@@ -10,6 +13,7 @@ var User = models.User;
 var Projects = models.Project;
 var UserProject = models.UserProject;
 var Comment = models.Comment;
+var Documentation = models.Documentation;
 
 // helpers
 var ProjectHelper = require('../helpers/ProjectHelper');
@@ -177,9 +181,7 @@ router.post('/create/', middleware.isAllowed, async function(req, res, next) {
 
 
 router.get('/:id/wall/', middleware.isAllowed, async function(req, res, next) {
-
     let project = await Projects.findById(req.params.id);
-
 
     let comments = await Comment.findAll({
         where: {
@@ -212,6 +214,102 @@ router.post('/:id/wall/', middleware.isAllowed, async function(req, res, next) {
 
     return res.redirect('/projects/' + req.params.id + '/wall');
 
+});
+
+router.get('/:id/documentation/', async function(req, res, next) {
+    let project = await Projects.findById(req.params.id);
+    let projectDocumentation = await ProjectHelper.getDocumentation(req.params.id);
+
+    res.render('documentations', { errorMessages: 0,
+        pageName: 'documentations', project: project, documents: projectDocumentation, username: req.user.username,
+        isUser: req.user.is_user, success: 0 });
+});
+
+router.get('/:id/documentation/create', async function(req, res, next) {
+    let project = await Projects.findById(req.params.id);
+
+    res.render('add_edit_document', { errorMessages: 0,
+        pageName: 'add_document', project: project, username: req.user.username,
+        isUser: req.user.is_user, success: 0 });
+});
+
+router.post('/:id/documentation/create/', async function(req, res, next) {
+    var data = req.body;
+
+    let doc =  await Documentation.create({
+        name: data.doc_name,
+        text: data.doc_body,
+        project_id: req.params.id
+    });
+    await doc.save();
+
+    return res.redirect('/projects/' + req.params.id + '/documentation');
+});
+
+router.get('/:id/documentation/upload', async function(req, res, next) {
+    let project = await Projects.findById(req.params.id);
+
+    res.render('upload_document', { errorMessages: 0,
+        pageName: 'upload_document', project: project, username: req.user.username,
+        isUser: req.user.is_user, success: 0 });
+});
+
+router.post('/:id/documentation/upload', async function(req, res, next) {
+    let project = await Projects.findById(req.params.id);
+    var data = req.body;
+    var form = new formidable.IncomingForm();
+
+    console.log("Got form")
+    form.parse(req, function (err, fields, files) { });
+
+    form.on('end', function(fields, files) {
+        var temp_path = this.openedFiles[0].path;
+        var file_name = this.openedFiles[0].name;
+        fs.readFile(temp_path, 'utf8', function(err, contents) {
+            Documentation.create({
+                name: file_name,
+                text: contents,
+                project_id: req.params.id
+            }).then(function() {
+                return res.redirect('/projects/' + req.params.id + '/documentation');
+            });
+        });
+    });
+
+    return;
+});
+
+router.get('/:id/documentation/:docId', async function(req, res, next) {
+    let project = await Projects.findById(req.params.id);
+    let document = await ProjectHelper.getDocument(req.params.docId);
+
+    res.render('document', { errorMessages: 0,
+        pageName: 'document', project: project, document: document, username: req.user.username,
+        isUser: req.user.is_user, success: 0 });
+});
+
+router.get('/:id/documentation/:docId/edit', async function(req, res, next) {
+    let project = await Projects.findById(req.params.id);
+    let document = await ProjectHelper.getDocument(req.params.docId);
+
+    res.render('add_edit_document', { errorMessages: 0,
+        pageName: 'edit_document', project: project, toEditDoc: document, username: req.user.username,
+        isUser: req.user.is_user, success: 0 });
+});
+
+router.post('/:id/documentation/:docId/edit', async function(req, res, next) {
+    let project = await Projects.findById(req.params.id);
+    let document = await ProjectHelper.getDocument(req.params.docId);
+
+    var data = req.body;
+
+    document.setAttributes({
+        name: data.doc_name,
+        text: data.doc_body,
+    });
+    await document.save();
+
+    return res.redirect('/projects/' + req.params.id + '/documentation/' + req.params.docId);
 });
 
 module.exports = router;

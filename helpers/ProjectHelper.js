@@ -2,6 +2,7 @@ var models = require('../models');
 var Project = models.Project;
 var UserProject = models.UserProject;
 var User = models.User;
+var Documentation = models.Documentation;
 var sequelize = require('sequelize');
 
 
@@ -97,6 +98,27 @@ async function isValidProject(project) {
         return existing[0].id == project.id;
     }
 
+}
+
+async function getDocumentation(projectId) {
+    return await Documentation.findAll({
+        where: {
+            project_id: projectId,
+        },
+        order: [
+            ['updatedAt', 'desc'],
+        ],
+    })
+}
+
+async function getDocument(docId) {
+    return await Documentation.findOne({
+        where: {
+            [models.Sequelize.Op.or]: [
+                {id: docId}
+            ]
+        },
+    })
 }
 
 async function saveProjectMembers(project, memberList) {
@@ -286,4 +308,6 @@ module.exports = {
     canAccessProject,
     getProject,
     getSMProjects,
+    getDocumentation,
+    getDocument
 };

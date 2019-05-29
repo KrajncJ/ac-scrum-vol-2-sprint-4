@@ -1,0 +1,58 @@
+extends layout
+
+block content
+
+    body
+        main.container(role="main")
+            .container.theme-showcase
+                .page-header
+
+                    .page-header
+                        h3 User documentation for project: #{project.name}
+                        .container
+                            nav.navbar.navbar-expand-lg.navbar-light.bg-light
+                                ul.navbar-nav.mr-auto
+                                    li.nav-item
+                                        a.nav-link(href='/projects/'+ project.id)
+                                            i.fas.fa-chevron-left
+                                            |   Project
+                                    li.nav-item
+                                        a.nav-link(href='/projects/'+ project.id + '/documentation/create')
+                                            i.fas.fa-plus
+                                            |   Create
+                                    li.nav-item
+                                        a.nav-link(href='/projects/'+ project.id + '/documentation/upload')
+                                            i.fas.fa-upload
+                                            |   Upload
+                    hr
+
+                    div.main.container
+                        div.row
+                            if documents.length
+                                div.col-md-12
+                                    table.pointers.table.table-bordered.table-hover(summary="User documentation")
+                                        thead.thead-dark
+                                            tr
+                                                //th User ID
+                                                th(scope="col") Document ID
+                                                th(scope="col") Document name
+
+                                                //th Edit
+                                        tbody
+                                            each doc in documents
+                                                tr.clickable-row(data-href='/projects/'+ project.id + '/documentation/' + doc.id)
+                                                    td #{doc.id}
+                                                    td #{doc.name}
+
+                        if !documents.length
+                            div.col-md-12
+                                p Create or upload new documentation
+
+    script.
+        window.addEventListener('load', function () {
+            $(document).ready(function ($) {
+                $(".clickable-row").click(function () {
+                    window.location = $(this).data("href");
+                });
+            });
+        })
