@@ -3,7 +3,7 @@ var router = express.Router();
 var middleware = require('./middleware.js');
 
 var models = require('../models/');
-
+var bcrypt = require('bcrypt');
 var User = models.User;
 
 router.get('/', middleware.isAllowed, function(req, res, next) {
@@ -58,7 +58,7 @@ router.post('/edit_user/:id', middleware.isAllowed, async function (req, res, ne
 
         // Set new attributes
         user.setAttributes({
-            password: data.password,
+            password: bcrypt.hashSync(data.password, 10),
         });
     }
 
@@ -71,7 +71,7 @@ router.post('/edit_user/:id', middleware.isAllowed, async function (req, res, ne
     });
 
     try {
-        await User.save(user);
+        await  user.save();
         req.flash('success', 'User updated');
         res.redirect('/dashboard');
         // res.render('register', { success: req.flash('success'), errorMessages: 0,

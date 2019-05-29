@@ -62,6 +62,14 @@ block content
                                                 div.custom-control.custom-checkbox
                                                     input#adminacc.custom-control-input(type='checkbox' name='is_user' value="0")
                                                     label.custom-control-label(for='adminacc') Administrator access
+                                            if user && self_user
+                                                div.custom-control.custom-checkbox
+                                                    input#adminacc.custom-control-input(type='checkbox' name='is_user' value="0")
+                                                    label.custom-control-label(for='adminacc') Administrator access
+                                            if user && !self_user
+                                                div.custom-control.custom-checkbox
+                                                    input#adminacc.custom-control-input(type='checkbox' name='is_user' value="0")
+                                                    label.custom-control-label(for='adminacc') Administrator access
 
                                             if user
                                                 button.btn.btn-primary.center-block.margin-top20#registerBtn(type='submit') Update
