@@ -60,7 +60,7 @@ router.get('/', middleware.ensureAuthenticated, async function(req, res, next) {
     });
 
     res.render('dashboard', { title: 'AC scrum vol2', pageName: 'dashboard', myProjects: myProjects,
-        myActiveSprints: myActiveSprints, myTasks: myTasks, username: req.user.username, isUser: req.user.is_user });
+        myActiveSprints: myActiveSprints, myTasks: myTasks, uid: req.user.id, username: req.user.username, isUser: req.user.is_user });
 });
 
 router.get('/projects', function(req, res, next) {

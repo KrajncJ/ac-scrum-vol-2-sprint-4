@@ -5,8 +5,10 @@ block content
     main.container(role="main")
         .container.theme-showcase
             .page-header
-                h3 Register new user
-                p Warning: Username cannot be changed once set.
+                if user
+                    h3 Edit user
+                if !user
+                    h3 Register new user
 
                 .container
                     nav.navbar.navbar-expand-lg.navbar-light.bg-light
@@ -34,30 +36,34 @@ block content
                     div.col-md-9.col-md-offset-0.margin-center.margin-top20
                         div.panel-body
                             div
-                                form.well.form-horizontal(method='POST' action='/register')#register_form
+                                form.well.form-horizontal(method='POST' action=!user ? '/register' : '/register/edit_user/'+uid)#register_form
                                     div.panel-body
                                         div.col-md-12.col-md-offset-0
                                             div.form-group
                                                 label(for='name') First name:
-                                                input#name.form-control(type='text' placeholder='First name' name='name' value="")
+                                                input#name.form-control(type='text' value=(user? user.name : '') placeholder='First name' name='name')
                                             div.form-group
                                                 label(for='surname') Surname:
-                                                input#surname.form-control(type='text' placeholder='Surname' name='surname' value="")
+                                                input#surname.form-control(type='text' placeholder='Surname' name='surname' value=!!user ? user.surname : '')
                                             div.form-group
                                                 label(for='email') E-mail:
-                                                input#email.form-control(type='text' placeholder='E-mail' name='email' value="")
+                                                input#email.form-control(type='text' placeholder='E-mail' name='email' value=!!user ? user.email: '')
                                             div.form-group
                                                 label(for='username') Username:
-                                                input#username.form-control(type='text' placeholder='Username' name='username' value="")
+                                                input#username.form-control(type='text' placeholder='Username' name='username' value=user ? user.username : '')
                                             div.form-group
                                                 label(for='password1') Password:
                                                 input#password1.form-control(type='password' placeholder='Enter password' name='password' value="")
                                             div.form-group
                                                 label(for='password2') Verify password:
                                                 input#password2.form-control(type='password' placeholder='Retype password' name='password2' value="")
-                                            div.custom-control.custom-checkbox
-                                                input#adminacc.custom-control-input(type='checkbox' name='is_user' value="0")
-                                                label.custom-control-label(for='adminacc') Administrator access
 
+                                            if !user
+                                                div.custom-control.custom-checkbox
+                                                    input#adminacc.custom-control-input(type='checkbox' name='is_user' value="0")
+                                                    label.custom-control-label(for='adminacc') Administrator access
 
-                                            button.btn.btn-primary.center-block.margin-top20#registerBtn(type='submit') Register
+                                            if user
+                                                button.btn.btn-primary.center-block.margin-top20#registerBtn(type='submit') Update
+                                            if !user
+                                                button.btn.btn-primary.center-block.margin-top20#registerBtn(type='submit') Register
