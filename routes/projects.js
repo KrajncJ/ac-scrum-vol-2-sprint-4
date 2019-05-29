@@ -180,7 +180,7 @@ router.post('/create/', middleware.isAllowed, async function(req, res, next) {
 
 
 
-router.get('/:id/wall/', middleware.isAllowed, async function(req, res, next) {
+router.get('/:id/wall/', async function(req, res, next) {
     let project = await Projects.findById(req.params.id);
 
     let comments = await Comment.findAll({
@@ -203,7 +203,7 @@ router.get('/:id/wall/', middleware.isAllowed, async function(req, res, next) {
         isUser: req.user.is_user, success: 0 });
 });
 
-router.post('/:id/wall/', middleware.isAllowed, async function(req, res, next) {
+router.post('/:id/wall/', async function(req, res, next) {
     var data = req.body;
     let comm =  await Comment.create({
         text: data.comment,

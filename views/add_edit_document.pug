@@ -31,7 +31,7 @@ block content
                                 h4.alert-heading Success.
                                 p #{success}.
 
-                    div.col-md-9.col-md-offset-0.margin-center.margin-top20
+                    div.col-md-12.col-md-offset-0.margin-center.margin-top20
                         div.panel-body
                             div
                                 form.well.form-horizontal(method='POST' action=(toEditDoc ? '/projects/'+ project.id + '/documentation/' + toEditDoc.id + '/edit/' : '/projects/'+ project.id + '/documentation/create'))#document_form
