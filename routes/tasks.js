@@ -70,6 +70,7 @@ router.post('/create/:projectId/:storyId', TasksHelper.checkIfSMorMember, async 
             name: data.name,
             description: data.description,
             time: data.time/6,
+            remainingTime: data.time/6,
             assignee: assignee,
             status: status,
             story_id: req.params.storyId,
@@ -97,6 +98,8 @@ router.post('/create/:projectId/:storyId', TasksHelper.checkIfSMorMember, async 
         }
 
         await createdTask.save();
+
+        await TasksHelper.createTimeLogs(createdTask, req.user.id);
 
         req.flash('success', 'Task - ' + createdTask.name + ' has been successfully created');
         res.render('add_edit_task', {
@@ -319,8 +322,8 @@ router.get('/:taskId/reject', middleware.ensureAuthenticated, async function(req
     res.redirect('/');
 });
 
-//  ------------- TEMP: start a task ----------------
-router.get('/:taskId/startTemp', middleware.ensureAuthenticated, async function(req, res, next) {
+//  ------------- start a task ----------------
+router.get('/:taskId/start', middleware.ensureAuthenticated, async function(req, res, next) {
     let task_id = req.params.taskId;
 
     let task = await Tasks.findOne({
@@ -338,7 +341,8 @@ router.get('/:taskId/startTemp', middleware.ensureAuthenticated, async function(
     }
 
     task.setAttributes({
-        status: 3
+        status: 3,
+        workStart: new Date()
     });
 
     // validate task
@@ -348,7 +352,45 @@ router.get('/:taskId/startTemp', middleware.ensureAuthenticated, async function(
 
     await task.save();
 
-    await startAutoTracking(task);
+    //req.flash('success', 'Task - ' + task.name + ' has been finished.');
+    res.redirect('/');
+});
+
+//  ------------- pause a task ----------------
+router.get('/:taskId/pause', middleware.ensureAuthenticated, async function(req, res, next) {
+    let task_id = req.params.taskId;
+
+    let task = await Tasks.findOne({
+        where: {
+            id: task_id
+        }
+    });
+
+
+    if (task.assignee !== req.user.id) {
+        req.flash('error', `Task ${task.name} has not been assigned to you.`);
+        return;
+    } else if (task.status === 2) {
+        req.flash('error', `Task ${task.name} has already been paused.`);
+        return;
+    }
+
+    let newRemainingTime = await stopAutoTracking(task);
+    let newLoggedTime = await TasksHelper.getTaskLoggedTime(task);
+
+    task.setAttributes({
+        status: 2,
+        workStart: null,
+        loggedTime: newLoggedTime,
+        remainingTime: newRemainingTime
+    });
+
+    // validate task
+    if (!await TasksHelper.isValidTaskChange(task)){
+        req.flash('error', `Task ${task.name} can not be paused right now.`);
+    }
+
+    await task.save();
 
     //req.flash('success', 'Task - ' + task.name + ' has been finished.');
     res.redirect('/');
@@ -384,44 +426,6 @@ router.get('/:taskId/finish', middleware.ensureAuthenticated, async function(req
 
     await task.save();
 
-    await stopAutoTracking(task);
-
-    //req.flash('success', 'Task - ' + task.name + ' has been finished.');
-    res.redirect('/');
-});
-
-//  ------------- finish a task ----------------
-router.get('/:taskId/pause', middleware.ensureAuthenticated, async function(req, res, next) {
-    let task_id = req.params.taskId;
-
-    let task = await Tasks.findOne({
-        where: {
-            id: task_id
-        }
-    });
-
-
-    if (task.assignee !== req.user.id) {
-        req.flash('error', `Task ${task.name} has not been assigned to you.`);
-        return;
-    } else if (task.status === 2) {
-        req.flash('error', `Task ${task.name} has already been paused.`);
-        return;
-    }
-
-    task.setAttributes({
-        status: 2
-    });
-
-    // validate task
-    if (!await TasksHelper.isValidTaskChange(task)){
-        req.flash('error', `Task ${task.name} can not be paused right now.`);
-    }
-
-    await task.save();
-
-    await stopAutoTracking(task);
-
     //req.flash('success', 'Task - ' + task.name + ' has been finished.');
     res.redirect('/');
 });
@@ -445,7 +449,7 @@ router.get('/:taskId/restart', middleware.ensureAuthenticated, async function(re
     }
 
     task.setAttributes({
-        status: 3
+        status: 2
     });
 
     // validate task
@@ -455,65 +459,98 @@ router.get('/:taskId/restart', middleware.ensureAuthenticated, async function(re
 
     await task.save();
 
-    await startAutoTracking(task);
+    //req.flash('success', 'Task - ' + task.name + ' has been finished.');
+    res.redirect('/');
+});
+
+//  ------------- set task timeLog ----------------
+router.get('/:taskId/logTime', middleware.ensureAuthenticated, async function(req, res, next) {
+    let task_id = req.params.taskId;
+    let data = req.body;
+
+    let task = await Tasks.findOne({
+        where: {
+            id: task_id
+        }
+    });
+
+    if (task.assignee !== req.user.id) {
+        req.flash('error', `Task ${task.name} has not been assigned to you.`);
+        return;
+    }
+
+    let newRemainingTime = data.remainingTime;
+    await saveTimeLog(task.id, data.logDate, newRemainingTime, data.loggedTime, true);
+    let newLoggedTime = TasksHelper.getTaskLoggedTime(task);
+
+    task.setAttributes({
+        status: 2,
+        workStart: null,
+        loggedTime: newLoggedTime,
+        remainingTime: newRemainingTime
+    });
+
+    // validate task
+    if (!await TasksHelper.isValidTaskChange(task)){
+        req.flash('error', `Task ${task.name} can not be paused right now.`);
+    }
+
+    await task.save();
 
     //req.flash('success', 'Task - ' + task.name + ' has been finished.');
     res.redirect('/');
 });
 
-let startAutoTracking = async function(task){
-    // Create new timetable
-    const createdTimetable = Timetable.build({
-        remainingTime: task.time,
-        loggedTime: 0,
-        loggedDate: new Date(),
-        autoLoggedDate: new Date(),
-        task_id: task.id,
-        loggedUser: task.assignee
-    });
-
-    await createdTimetable.save();
-    console.log("Auto tracker for task ID " + task.id + " started.");
-};
-
 let stopAutoTracking = async function(task){
 
-    let timetableArray = await Timetable.findAll({
+    let startDate = task.workStart;
+    let nowDate = new Date();
+    let todayDate = new Date();
+    todayDate.setHours(0,0,0,0);
+
+    let timeDifference = (nowDate - startDate / 1000) / 3600;
+    if (timeDifference < 0.016) {
+        // manj kot minuta, damo na 0 (error)
+        timeDifference = 0.0;
+    }
+    timeDifference = timeDifference / 6; // shranimo v točkah
+
+    return saveTimeLog(task.id, todayDate, timeDifference, timeDifference, false);
+};
+
+let saveTimeLog = async function(taskId, todayDate, remainingTime, loggedTime, overwrite = false) {
+    let timeLogArray = await Timetable.findAll({
         where: {
-            task_id: task.id
+            task_id: taskId,
+            logDate: todayDate
         },
         order: [
             ['id', 'DESC']
         ],
     });
+    if (timeLogArray.length < 1) {
 
-    var timetable = timetableArray[timetableArray.length - 1]; // get last
-    var startDate = timetable.loggedDate;
-    var endDate = new Date();
-    var timeDifferenceMS = endDate - startDate;
-    var timeDifferenceHours = (timeDifferenceMS / 1000) / 3600;
-    if (timeDifferenceHours < 0.016) {
-        // manj kot minuta, damo na 1 minuto
-        timeDifferenceHours = 1 / 60;
+    }
+    let timeLog = timeLogArray[timeLogArray.length - 1];
+
+    let remTime = 0.0;
+    let loggTime = 0.0;
+    if (overwrite) {
+        remTime = remainingTime;
+        loggTime = loggedTime;
+    } else {
+        remTime = Math.max(0.0, timeLog.remainingTime - remainingTime);
+        loggTime = timeLog.loggedTime + loggedTime;
     }
 
-    timeDifferenceHours = timeDifferenceHours / 6; // shranimo v točkah
-
-    timetable.setAttributes({
-        remainingTime: task.time,
-        loggedTime: timeDifferenceHours,
-        loggedDate: endDate,
-        loggedUser: task.assignee
+    timeLog.setAttributes({
+        remainingTime: remTime,
+        loggedTime: loggTime,
     });
 
-    await timetable.save();
+    await timeLog.save();
 
-    var loggedTime = await TasksHelper.getTaskLoggedTime(task);
-    task.setAttributes({
-        loggedTime: loggedTime
-    });
-    await task.save();
-
-    console.log("Auto tracker for task ID " + task.id + " stopped.");
+    return remTime;
 };
+
 module.exports = router;

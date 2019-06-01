@@ -6,15 +6,9 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true,
         },
-        remainingTime: {
-            type: DataTypes.FLOAT,
-            allowNull: false,
-            validate: {
-                min: {
-                    args: [0.0],
-                    msg: 'Cant be a negative value.'
-                }
-            }
+        logDate: {
+            type: DataTypes.DATE,
+            allowNull: false
         },
         loggedTime: {
             type: DataTypes.FLOAT,
@@ -26,13 +20,15 @@ module.exports = (sequelize, DataTypes) => {
                 }
             }
         },
-        loggedDate: {
-            type: DataTypes.DATE,
+        remainingTime: {
+            type: DataTypes.FLOAT,
             allowNull: false,
-        },
-        autoLoggedDate: {
-            type: DataTypes.DATE,
-            allowNull: false,
+            validate: {
+                min: {
+                    args: [0.0],
+                    msg: 'Cant be a negative value.'
+                }
+            }
         },
         createdAt: {
             field: 'createdat',

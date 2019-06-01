@@ -105,14 +105,34 @@ block content
                                                                         p.mb-1(style="font-size:9pt")
                                                                             |  #{acceptedTask.description}
                                                                 div.col-sm-2
-                                                                    a.btn.btn-primary.float-right(href='/tasks/' + acceptedTask.id + '/startTemp')
+                                                                    a.btn.btn-primary.float-right(href='/tasks/' + acceptedTask.id + '/start')
                                                                         | Start work
                                                                 div.col-sm-3
                                                                     a.btn.btn-danger.float-left(href='/tasks/' + acceptedTask.id + '/reject')
                                                                         | X
-                                                                    if (acceptedTask.loggedTime > 0.0)
+                                                                    if (acceptedTask.remainingTime === 0.0)
                                                                         a.btn.btn-success(href='/tasks/' + acceptedTask.id + '/finish', style="margin-left: 30px;")
                                                                             | Mark as done
+                                                                    if (acceptedTask.remainingTime > 0.0)
+                                                                        a.btn.btn-primary(role='button', data-toggle='modal', data-target='#modalTimetable' + acceptedTask.id, style="margin-left: 30px;")
+                                                                            | Log time
+                                                                        .modal.fade(id="modalTimetable" + acceptedTask.id, tabindex='-1', role='dialog', aria-labelledby='modalTitle' + acceptedTask.id, aria-hidden='true')
+                                                                            .modal-dialog(role='document')
+                                                                                .modal-content
+                                                                                    .modal-header
+                                                                                        h5.modal-title(id="modalTitle" + acceptedTask.id) #{acceptedTask.name}
+                                                                                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                                                                            span(aria-hidden='true') x
+                                                                                    .modal-body.font-16
+                                                                                        each taskDay in acceptedTask.taskDays
+                                                                                            div.list-group
+                                                                                                div.list-group-item.list-group-item-action
+                                                                                                    | Test day...
+
+                                                                                    .modal-footer
+                                                                                        button.btn.btn-secondary(type="button" data-dismiss="modal") Close
+                                                                                        a.btn.btn-primary.nav-link.float-right(href='/tasks/' + acceptedTask.id + '/edit', style="width: 25%;") Edit task
+
 
                                             if (separator && myTasks.inProgress.length !== 0)
                                                 hr

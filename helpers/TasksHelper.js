@@ -156,6 +156,23 @@ async function checkIfSMorMember(req, res, next) {
     }
 }
 
+async function createTimeLogs(task, user) {
+    let story = await StoriesHelper.getStory(task.story_id);
+    let sprint = await SprintsHelper.getSprint(story.sprint_id);
+    let i = 0;
+    while (sprint.startDate.getDate() + i < sprint.endDate.getDate()) {
+        const createdTimeLog = Timetable.build({
+            logDate: sprint.startDate.getDate() + i,
+            loggedTime: 0.0,
+            remainingTime: task.remainingTime,
+            task_id: task.id,
+            loggedUser: user
+        });
+
+        await createdTimeLog.save();
+    }
+}
+
 async function getTaskLoggedTime(task) {
 
     let timetableArray = await Timetable.findAll({
@@ -167,12 +184,9 @@ async function getTaskLoggedTime(task) {
         ],
     });
 
-    var tmpTime = 0;
+    let tmpTime = 0;
     timetableArray.forEach(function (loggedTask) {
-        // task je še v procesu logiranja časa
-        if (loggedTask.dataValues.loggedDate.getTime() !== loggedTask.dataValues.autoLoggedDate.getTime()) {
-            tmpTime = tmpTime + loggedTask.dataValues.loggedTime;
-        }
+        tmpTime = tmpTime + loggedTask.dataValues.loggedTime;
     });
 
     return tmpTime;
@@ -187,5 +201,6 @@ module.exports = {
     deleteTasksByStoryId,
     isValidTaskChange,
     checkIfSMorMember,
+    createTimeLogs,
     getTaskLoggedTime
 };

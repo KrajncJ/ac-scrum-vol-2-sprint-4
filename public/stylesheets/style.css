@@ -117,3 +117,7 @@ nav {
 .dt-blue {
   background-color: aliceblue !important;
 }
+
+.modal{
+  overflow: visible !important;
+}

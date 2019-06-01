@@ -138,9 +138,7 @@ router.post('/create', SprintsHelper.isSM, async function(req, res, next) {
             project_id:data.sprint_project
         });
 
-
-        await StoriesHelper.setSprintStories(createdSprint.id,data.stories)
-
+        await StoriesHelper.setSprintStories(createdSprint.id,data.stories);
 
         req.flash('success');
         res.render("add_edit_sprint", {

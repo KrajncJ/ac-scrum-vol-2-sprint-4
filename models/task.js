@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         loggedTime: {
             type: DataTypes.FLOAT,
-            allowNull: true,
+            allowNull: false,
             validate: {
                 min: {
                     args: [0.0],
@@ -38,6 +38,20 @@ module.exports = (sequelize, DataTypes) => {
                 }
             },
             defaultValue: 0
+        },
+        remainingTime: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
+            validate: {
+                min: {
+                    args: [0.0],
+                    msg: 'Cant be a negative value.'
+                }
+            }
+        },
+        workStart: {
+            type: DataTypes.DATE,
+            allowNull: true
         },
         assignee: {
             type: DataTypes.INTEGER,
