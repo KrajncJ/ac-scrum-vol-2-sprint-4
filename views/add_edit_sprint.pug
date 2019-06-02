@@ -107,7 +107,7 @@ block content
                     var s_formated = moment(start_date, 'YYYY-MM-DD').format("DD.MM.YYYY");
                     flatpickr("#flatpickr-tryme", {
                         mode: "range",
-                        minDate: start_date, //TODO: maybe to change
+                        minDate: "today", //TODO: maybe to change
                         dateFormat: "d.m.Y",
                         defaultDate: [s_formated,e_formated]
                     });

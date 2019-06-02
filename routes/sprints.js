@@ -169,6 +169,26 @@ router.post('/create', SprintsHelper.isSM, async function(req, res, next) {
 
 });
 
+//  ------------- view a sprint ----------------
+router.get('/:id/remove', SprintsHelper.canAccessProjectBySprintId, async function(req, res, next) {
+    let sprint_id = req.params.id;
+
+    let success;
+    try {
+        success = !!await Sprint.remove({ where: {
+            id: sprint_id
+          },
+            force:true,
+        });
+    } catch (e) {
+        success = false;
+    }
+
+
+    res.redirect('/sprints');
+
+});
+
 
 //  ------------- view a sprint ----------------
 router.get('/:id/view', SprintsHelper.canAccessProjectBySprintId, async function(req, res, next) {
@@ -209,8 +229,10 @@ router.get('/:id/view', SprintsHelper.canAccessProjectBySprintId, async function
         selected_sprint_date: selected_sprint_date,
         isUser: req.user.is_user,
         currentSprint: currentSprint,
-        activeSprintId:activeSprintId});
+        activeSprintId:activeSprintId,
+        canEditSprint: Date.parse(currentSprint.startDate) > Date.now(),
     });
+});
 
 
 //  ------------- edit a sprint ----------------
@@ -256,7 +278,7 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
         var s_formated = moment(s_date,'DD.MM.YYYY').format("YYYY-MM-DD")
         var e_formatted = moment(e_date, 'DD.MM.YYYY').format("YYYY-MM-DD")
 
-        selected_sprint_date =   s_date + " to " + e_date;
+        selected_sprint_date = s_date + " to " + e_date;
 
         var Date_s_date = new Date(s_formated);
         var Date_e_date = new Date(e_formatted);
@@ -285,8 +307,6 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
                     toEditSprint: currentSprint,
                     stories: projectStories,
                     currentSprint:currentSprint,
-
-
                 });
 
                 return;
@@ -308,7 +328,6 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
                 toEditSprint: currentSprint,
                 stories: projectStories,
                 currentSprint:currentSprint,
-
             });
             return;
         }
