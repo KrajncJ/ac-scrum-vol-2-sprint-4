@@ -333,19 +333,18 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
         }
 
         // Edit sprint
-        const createdSprint = await Sprint.update({
+        await Sprint.update({
             startDate: s_formated,
             endDate: e_formatted,
             velocity: data.velocity,
             project_id:data.sprint_project
             },
-            {where:{id:currentSprint.id}}
+            {where:{id:currentSprint.dataValues.id}}
         );
 
-        await StoriesHelper.setSprintStories(createdSprint.id,data.stories);
-        await TasksHelper.setSprintStoriesTasksLogs(createdSprint, req.user.id,);
-
-        currentSprint  = await SprintsHelper.getSprint(req.params.id);
+        const updatedSprint = await SprintsHelper.getSprint(req.params.id);
+        await StoriesHelper.setSprintStories(updatedSprint.dataValues.id, data.stories);
+        await TasksHelper.setSprintStoriesTasksLogs(updatedSprint.dataValues, req.user.id,);
 
         // req.flash('success');
         res.render("sprint", {
@@ -360,7 +359,7 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
             toEditSprint: false,
             project:currentProject,
             stories: projectStories,
-            currentSprint:currentSprint,
+            currentSprint:updatedSprint,
             selected_sprint_date: selected_sprint_date,
         });
     } catch (e){
