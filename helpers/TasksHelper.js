@@ -220,7 +220,7 @@ async function getTaskLoggedTime(task) {
     return tmpTime;
 }
 
-async function setSprintStoriesTasksLogs(sprint, user) {
+async function setSprintStoriesTasksLogs(sprint, userId) {
     let sprintStories = await Stories.findAll( {
         where: {
             sprint_id: sprint.id
@@ -228,11 +228,11 @@ async function setSprintStoriesTasksLogs(sprint, user) {
     );
 
     for (let i = 0; i < sprintStories.length; i++) {
-        await setStoryTasksLogs(sprintStories[i].id, sprint.startDate, sprint.endDate, user);
+        await setStoryTasksLogs(sprintStories[i].id, sprint.startDate, sprint.endDate, userId);
     }
 }
 
-async function setStoryTasksLogs(storyId, startDateIn, endDateIn, user) {
+async function setStoryTasksLogs(storyId, startDateIn, endDateIn, userId) {
     let storyTasks = await Tasks.findAll({
         where: {
             story_id: storyId
@@ -246,13 +246,14 @@ async function setStoryTasksLogs(storyId, startDateIn, endDateIn, user) {
 
         while (startDate < endDate) {
             let dateIn = moment(startDate,'DD.MM.YYYY').format("YYYY-MM-DD");
-            if (!getTaskDayLog(storyTasks[i], dateIn)) {
+            let existingLog = await getTaskDayLog(storyTasks[i].dataValues, dateIn);
+            if (existingLog === false) {
                 const createdTimeLog = Timetable.build({
                     logDate: dateIn,
                     loggedTime: 0.0,
-                    remainingTime: task.remainingTime,
-                    task_id: task.id,
-                    loggedUser: user
+                    remainingTime: storyTasks[i].dataValues.remainingTime,
+                    task_id: storyTasks[i].dataValues.id,
+                    loggedUser: userId
                 });
                 await createdTimeLog.save();
             }
