@@ -20,8 +20,12 @@ block content
                                     i.fas.fa-chevron-left
                                     |   Sprints
                                     if !isUser || project.scrum_master == uid
-                                        li.nav-item
-                                            a.nav-link(href='/sprints/' + currentSprint.id + '/edit') Edit Sprint
+                                        if canEditSprint
+                                            li.nav-item
+                                                a.nav-link(href='/sprints/' + currentSprint.id + '/edit') Edit Sprint
+                                            li.nav-item
+                                                a.nav-link(href='/sprints/' + currentSprint.id + '/remove') Remove Sprint
+
 
                 hr
             div.main.container
