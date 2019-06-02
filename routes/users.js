@@ -29,7 +29,17 @@ var middleware = require('./middleware.js');
 
 });*/
 
+function hasPermissions(login_user, user_id) {
+  if(!login_user.is_user) return true;
+  return login_user.id == user_id
+}
+
+
 router.get('/:id/edita', middleware.ensureAuthenticated, async function (req, res, next) {
+  if(!hasPermissions(req.user, req.params.id)) {
+    res.redirect('/')
+  }
+
 
   let user = await User.findOne({
     where: {
@@ -45,11 +55,16 @@ router.get('/:id/edita', middleware.ensureAuthenticated, async function (req, re
     username: req.user.username,
     success: 0,
     user: user,
+    isSelf: req.user.id == req.params.id,
   });
 });
 
 
 router.post('/:id/edita', middleware.ensureAuthenticated, async function (req, res, next) {
+  if(!hasPermissions(req.user, req.params.id)) {
+    res.redirect('/')
+  }
+
   let data = req.body;
   let user = await getUsera(req.params.id);
 
@@ -75,7 +90,8 @@ router.post('/:id/edita', middleware.ensureAuthenticated, async function (req, r
         name: data.name,
         surname: data.surname,
         email: data.email,
-        is_user: data.is_user ? 0 : 1
+        is_user: data.is_user ? 0 : 1,
+        isSelf: req.user.id == req.params.id,
       });
 
       await user.save().catch(function (err) {
@@ -96,6 +112,7 @@ router.post('/:id/edita', middleware.ensureAuthenticated, async function (req, r
     username: req.user.username,
     success: errorMessages === 0 ? req.flash('success') : 0,
     user: user,
+    isSelf: req.user.id == req.params.id,
   });
 
 });
