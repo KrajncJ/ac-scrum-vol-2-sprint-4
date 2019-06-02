@@ -77,7 +77,7 @@ block content
                                                                 div.col-sm-8
                                                                     a(href='/tasks/' + pendingTask.id + '/edit', style='text-decoration: none')
                                                                         .d-flex.w-100.justify-content-between
-                                                                            h6.mb-1 #{pendingTask.name} [estimate: #{Math.round(pendingTask.time * 6 * 2) / 2}h]
+                                                                            h6.mb-1(style="color: black") #{pendingTask.name} [estimate: #{Math.round(pendingTask.time * 6 * 2) / 2}h]
                                                                         p.mb-1(style="font-size:9pt")
                                                                             |  #{pendingTask.description}
                                                                 div.col-sm-4
@@ -97,13 +97,18 @@ block content
                                                     div.list-group-item.list-group-item-action
                                                         div.container
                                                             div.row
-                                                                div.col-sm-7
+                                                                div.col-sm-6
                                                                     a(href='/tasks/' + acceptedTask.id + '/edit', style='text-decoration: none')
                                                                         .d-flex.w-100.justify-content-between
-                                                                            - loggedText = acceptedTask.loggedTime > 0.0 ? ", logged time: " + (acceptedTask.loggedTime * 6).toFixed(2) + "h" : ""
-                                                                            h6.mb-1 #{acceptedTask.name} [estimate: #{Math.round(acceptedTask.time * 6 * 2) / 2}h#{loggedText}]
+                                                                            h6.mb-1(style="color: black")
+                                                                                | #{acceptedTask.name} -
+                                                                                span(style="color: blue")  #{Math.round(acceptedTask.time * 6 * 2) / 2}h
+                                                                                | #{acceptedTask.loggedTime > 0.0 ? " [logged: " + (acceptedTask.loggedTime * 6).toFixed(2) + ", remaining: " + (acceptedTask.remainingTime * 6).toFixed(2) + "]" : ""}
                                                                         p.mb-1(style="font-size:9pt")
                                                                             |  #{acceptedTask.description}
+                                                                div.col-sm-1
+                                                                    a.btn.btn-primary(role='button', data-toggle='modal', data-target='#modalTimetable' + acceptedTask.id, style="margin-left: 30px;")
+                                                                        | &#9201;
                                                                 div.col-sm-2
                                                                     a.btn.btn-primary.float-right(href='/tasks/' + acceptedTask.id + '/start')
                                                                         | Start work
@@ -113,26 +118,39 @@ block content
                                                                     if (acceptedTask.remainingTime === 0.0)
                                                                         a.btn.btn-success(href='/tasks/' + acceptedTask.id + '/finish', style="margin-left: 30px;")
                                                                             | Mark as done
-                                                                    if (acceptedTask.remainingTime > 0.0)
-                                                                        a.btn.btn-primary(role='button', data-toggle='modal', data-target='#modalTimetable' + acceptedTask.id, style="margin-left: 30px;")
-                                                                            | Log time
-                                                                        .modal.fade(id="modalTimetable" + acceptedTask.id, tabindex='-1', role='dialog', aria-labelledby='modalTitle' + acceptedTask.id, aria-hidden='true')
-                                                                            .modal-dialog(role='document')
-                                                                                .modal-content
-                                                                                    .modal-header
-                                                                                        h5.modal-title(id="modalTitle" + acceptedTask.id) #{acceptedTask.name}
-                                                                                        button.close(type='button', data-dismiss='modal', aria-label='Close')
-                                                                                            span(aria-hidden='true') x
-                                                                                    .modal-body.font-16
-                                                                                        each taskDay in acceptedTask.taskDays
-                                                                                            div.list-group
-                                                                                                div.list-group-item.list-group-item-action
-                                                                                                    | Test day...
-
-                                                                                    .modal-footer
-                                                                                        button.btn.btn-secondary(type="button" data-dismiss="modal") Close
-                                                                                        a.btn.btn-primary.nav-link.float-right(href='/tasks/' + acceptedTask.id + '/edit', style="width: 25%;") Edit task
-
+                                            each acceptedTask in myTasks.accepted
+                                                .modal.fade(id="modalTimetable" + acceptedTask.id, tabindex='-1', role='dialog', aria-labelledby='modalTitle' + acceptedTask.id, aria-hidden='true')
+                                                    .modal-dialog.modal-dialog-scrollable(role='document', style="width: 600px")
+                                                        .modal-content
+                                                            .modal-header
+                                                                h5.modal-title(id="modalTitle" + acceptedTask.id) #{acceptedTask.name}
+                                                                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                                                    span(aria-hidden='true') x
+                                                            .modal-body.font-16
+                                                                div.list-group
+                                                                    .form-group.row.align-items-center(style="margin: 0px; margin-left: 70px")
+                                                                        .col-sm-2
+                                                                            | Date
+                                                                        .col-sm-1
+                                                                            |
+                                                                        .col-sm-3
+                                                                            | Logged time
+                                                                        .col-sm-4
+                                                                            | Remaining time
+                                                                        .col-sm-2
+                                                                            |
+                                                                    each taskDay in acceptedTask.taskDays
+                                                                        div.list-group-item.list-group-item-action
+                                                                            form(method='POST' action=('/tasks/'+ taskDay.id + '/logTime'))
+                                                                                .form-group.row.align-items-center(style="margin: 0px")
+                                                                                    .col-sm-4
+                                                                                        | #{taskDay.logDate}
+                                                                                    .col-sm-3
+                                                                                        input#loggedTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.loggedTime name='loggedTime' value=Math.round(taskDay.loggedTime * 6 * 2) / 2 )
+                                                                                    .col-sm-3
+                                                                                        input#remainingTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.remainingTime name='remainingTime' value=Math.round(taskDay.remainingTime * 6 * 2) / 2 )
+                                                                                    .col-sm-2
+                                                                                        button.btn.btn-primary(type='submit') Save
 
                                             if (separator && myTasks.inProgress.length !== 0)
                                                 hr
@@ -148,7 +166,10 @@ block content
                                                                 div.col-sm-8
                                                                     a(href='/tasks/' + activeTask.id + '/edit', style='text-decoration: none')
                                                                         .d-flex.w-100.justify-content-between
-                                                                            h6.mb-1 #{activeTask.name} [estimate: #{Math.round(activeTask.time * 6 * 2) / 2}h, logged time: #{(activeTask.loggedTime * 6).toFixed(2)}h]
+                                                                            h6.mb-1(style="color: black")
+                                                                                | #{activeTask.name} -
+                                                                                span(style="color: blue")  #{Math.round(activeTask.time * 6 * 2) / 2}h
+                                                                                | #{activeTask.loggedTime > 0.0 ? " [logged: " + (activeTask.loggedTime * 6).toFixed(2) + ", remaining: " + (activeTask.remainingTime * 6).toFixed(2) + "]" : ""}
                                                                         p.mb-1(style="font-size:9pt")
                                                                             |  #{activeTask.description}
                                                                 div.col-sm-4
@@ -168,7 +189,10 @@ block content
                                                                 div.col-sm-8
                                                                     a(href='/tasks/' + doneTask.id + '/edit', style='text-decoration: none')
                                                                         .d-flex.w-100.justify-content-between
-                                                                            h6.mb-1 #{doneTask.name} [estimate: #{Math.round(doneTask.time * 6 * 2) / 2}h, logged time: #{(doneTask.loggedTime * 6).toFixed(2)}h]
+                                                                            h6.mb-1(style="color: black")
+                                                                                | #{doneTask.name} -
+                                                                                span(style="color: blue")  #{Math.round(doneTask.time * 6 * 2) / 2}h
+                                                                                | #{doneTask.loggedTime > 0.0 ? " [logged: " + (doneTask.loggedTime * 6).toFixed(2) + ", remaining: " + (doneTask.remainingTime * 6).toFixed(2) + "]" : ""}
                                                                         p.mb-1(style="font-size:9pt")
                                                                             | #{doneTask.description}
                                                                 div.col-sm-3

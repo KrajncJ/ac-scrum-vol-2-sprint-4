@@ -1,5 +1,6 @@
 const models = require('../models');
 
+const Stories = models.Stories;
 const Tasks = models.Tasks;
 const User = models.User;
 const Timetable = models.Timetable;
@@ -159,10 +160,14 @@ async function checkIfSMorMember(req, res, next) {
 async function createTimeLogs(task, user) {
     let story = await StoriesHelper.getStory(task.story_id);
     let sprint = await SprintsHelper.getSprint(story.sprint_id);
-    let i = 0;
-    while (sprint.startDate.getDate() + i < sprint.endDate.getDate()) {
+    let startDate = new Date(sprint.startDate);
+    let endDate = new Date(sprint.endDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    while (startDate < endDate) {
+        let dateIn = moment(startDate,'DD.MM.YYYY').format("YYYY-MM-DD");
         const createdTimeLog = Timetable.build({
-            logDate: sprint.startDate.getDate() + i,
+            logDate: dateIn,
             loggedTime: 0.0,
             remainingTime: task.remainingTime,
             task_id: task.id,
@@ -170,7 +175,33 @@ async function createTimeLogs(task, user) {
         });
 
         await createdTimeLog.save();
+
+        startDate.setDate(startDate.getDate() + 1);
     }
+}
+
+async function getTaskLogs(task) {
+    return await Timetable.findAll({
+        where: {
+            task_id: task.id
+        },
+        order: [
+            ['id', 'ASC']
+        ]
+    });
+}
+
+async function getTaskDayLog(task, date) {
+    let timeLogArray = await Timetable.findAll({
+        where: {
+            task_id: task.id,
+            logDate: date
+        }
+    });
+    if (timeLogArray.length < 1) {
+        return false;
+    }
+    return timeLogArray[timeLogArray.length - 1];
 }
 
 async function getTaskLoggedTime(task) {
@@ -178,10 +209,7 @@ async function getTaskLoggedTime(task) {
     let timetableArray = await Timetable.findAll({
         where: {
             task_id: task.id
-        },
-        order: [
-            ['id', 'DESC']
-        ],
+        }
     });
 
     let tmpTime = 0;
@@ -190,6 +218,63 @@ async function getTaskLoggedTime(task) {
     });
 
     return tmpTime;
+}
+
+async function setSprintStoriesTasksLogs(sprint, user) {
+    let sprintStories = await Stories.findAll( {
+        where: {
+            sprint_id: sprint.id
+        }}
+    );
+
+    for (let i = 0; i < sprintStories.length; i++) {
+        await setStoryTasksLogs(sprintStories[i].id, sprint.startDate, sprint.endDate, user);
+    }
+}
+
+async function setStoryTasksLogs(storyId, startDateIn, endDateIn, user) {
+    let storyTasks = await Tasks.findAll({
+        where: {
+            story_id: storyId
+        }
+    });
+
+    for (let i = 0; i < storyTasks.length; i++) {
+        let startDate = new Date(startDateIn);
+        let endDate = new Date(endDateIn);
+        endDate.setDate(endDate.getDate() + 1);
+
+        while (startDate < endDate) {
+            let dateIn = moment(startDate,'DD.MM.YYYY').format("YYYY-MM-DD");
+            if (!getTaskDayLog(storyTasks[i], dateIn)) {
+                const createdTimeLog = Timetable.build({
+                    logDate: dateIn,
+                    loggedTime: 0.0,
+                    remainingTime: task.remainingTime,
+                    task_id: task.id,
+                    loggedUser: user
+                });
+                await createdTimeLog.save();
+            }
+
+            startDate.setDate(startDate.getDate() + 1);
+        }
+    }
+}
+
+async function deleteLogs(taskId) {
+    // !! - return true if successful, else false
+    try {
+        return !!await Timetable.destroy({
+            where: {
+                task_id: taskId
+            },
+            force:true
+        });
+    } catch (e) {
+        console.log("Can't delete " + e);
+        return false;
+    }
 }
 
 module.exports = {
@@ -202,5 +287,10 @@ module.exports = {
     isValidTaskChange,
     checkIfSMorMember,
     createTimeLogs,
-    getTaskLoggedTime
+    getTaskLogs,
+    getTaskDayLog,
+    getTaskLoggedTime,
+    setStoryTasksLogs,
+    setSprintStoriesTasksLogs,
+    deleteLogs
 };

@@ -121,3 +121,7 @@ nav {
 .modal{
   overflow: visible !important;
 }
+
+.list-group-item, .list-group-item:hover {
+  z-index: auto;
+}

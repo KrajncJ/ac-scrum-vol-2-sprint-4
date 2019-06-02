@@ -8,7 +8,6 @@ var UserProject = models.UserProject;
 var ProjectHelper = require('../helpers/ProjectHelper');
 var TasksHelper = require('../helpers/TasksHelper');
 
-/* GET home page. */
 router.get('/', middleware.ensureAuthenticated, async function(req, res, next) {
 
     let myProjects = await ProjectHelper.getMyProjects(req.user.id);
@@ -37,27 +36,28 @@ router.get('/', middleware.ensureAuthenticated, async function(req, res, next) {
 
     let myTasksAll = await TasksHelper.listUserTasks(req.user.id);
     let myTasks = {pending: [], accepted: [], inProgress: [], done: []};
-    myTasksAll.forEach(function (task) {
+    for (let j = 0; j < myTasksAll.length; j++) {
         for (let i = 0; i < myActiveSprints.length; i++) {
-            if (task.status !== 0 && myActiveSprints[i].id === task.Story.sprint_id) {
-                switch (task.status) {
+            if (myTasksAll[j].status !== 0 && myActiveSprints[i].id === myTasksAll[j].Story.sprint_id) {
+                switch (myTasksAll[j].status) {
                     case 1:
-                        myTasks.pending.push(task);
+                        myTasks.pending.push(myTasksAll[j]);
                         break;
                     case 2:
-                        myTasks.accepted.push(task);
+                        myTasksAll[j].taskDays = await TasksHelper.getTaskLogs(myTasksAll[j]);
+                        myTasks.accepted.push(myTasksAll[j]);
                         break;
                     case 3:
-                        myTasks.inProgress.push(task);
+                        myTasks.inProgress.push(myTasksAll[j]);
                         break;
                     case 4:
-                        myTasks.done.push(task);
+                        myTasks.done.push(myTasksAll[j]);
                         break;
                 }
                 break;
             }
         }
-    });
+    }
 
     res.render('dashboard', { title: 'AC scrum vol2', pageName: 'dashboard', myProjects: myProjects,
         myActiveSprints: myActiveSprints, myTasks: myTasks, uid: req.user.id, username: req.user.username, isUser: req.user.is_user });

@@ -76,10 +76,8 @@ router.post('/create', SprintsHelper.isSM, async function(req, res, next) {
         var s_date = selected_date_array[0];
         var e_date = selected_date_array[1];
 
-
-        var s_formated = moment(s_date,'DD.MM.YYYY').format("YYYY-MM-DD")
-        var e_formatted = moment(e_date, 'DD.MM.YYYY').format("YYYY-MM-DD")
-
+        var s_formated = moment(s_date,'DD.MM.YYYY').format("YYYY-MM-DD");
+        var e_formatted = moment(e_date, 'DD.MM.YYYY').format("YYYY-MM-DD");
 
         var Date_s_date = new Date(s_formated);
         var Date_e_date = new Date(e_formatted);
@@ -285,7 +283,6 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
                     username: req.user.username,
                     isUser: req.user.is_user,
                     toEditSprint: currentSprint,
-                    projects: ad_sm_projects,
                     stories: projectStories,
                     currentSprint:currentSprint,
 
@@ -309,7 +306,6 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
                 username: req.user.username,
                 isUser: req.user.is_user,
                 toEditSprint: currentSprint,
-                projects: ad_sm_projects,
                 stories: projectStories,
                 currentSprint:currentSprint,
 
@@ -317,7 +313,7 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
             return;
         }
 
-        // Create new sprint
+        // Edit sprint
         const createdSprint = await Sprint.update({
             startDate: s_formated,
             endDate: e_formatted,
@@ -327,9 +323,11 @@ router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {
             {where:{id:currentSprint.id}}
         );
 
-        await StoriesHelper.setSprintStories(createdSprint.id,data.stories)
+        await StoriesHelper.setSprintStories(createdSprint.id,data.stories);
+        await TasksHelper.setSprintStoriesTasksLogs(createdSprint, req.user.id,);
 
         currentSprint  = await SprintsHelper.getSprint(req.params.id);
+
         // req.flash('success');
         res.render("sprint", {
             projects: ad_sm_projects,

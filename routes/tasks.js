@@ -190,6 +190,8 @@ router.post('/:taskId/edit/', TasksHelper.checkIfSMorMember, async function(req,
 
     let assignee = task.assignee;
     let status = task.status;
+    let newRemainingTime = task.remainingTime;
+    let newLoggedTime = task.loggedTime;
     if (data.assignee === "") {
         assignee = null;
         status = 0;
@@ -197,6 +199,10 @@ router.post('/:taskId/edit/', TasksHelper.checkIfSMorMember, async function(req,
     else if (data.assignee !== task.assignee) {
         assignee = data.assignee;
         status = 1;
+        if (task.workStart !== null) {
+            newRemainingTime = await stopAutoTracking(task);
+            newLoggedTime = await TasksHelper.getTaskLoggedTime(task);
+        }
     }
 
     // Set new attributes
@@ -204,6 +210,9 @@ router.post('/:taskId/edit/', TasksHelper.checkIfSMorMember, async function(req,
         name: data.name,
         description: data.description,
         time: data.time/6,
+        loggedTime: newLoggedTime,
+        remainingTime: newRemainingTime,
+        workStart: null,
         assignee: assignee,
         status: status
     });
@@ -253,7 +262,8 @@ router.get('/:taskId/delete', TasksHelper.checkIfSMorMember, async function(req,
     });
 
     let is_deleted = await TasksHelper.deleteTaskById(task_id);
-    if (is_deleted) {
+    let is_deleted_timeLogs = await TasksHelper.deleteLogs(task_id);
+    if (is_deleted && is_deleted_timeLogs) {
         return res.redirect('/projects/'+ task.project_id +'/view');
     }else{
         return res.status(500).send('Delete failed')
@@ -464,30 +474,47 @@ router.get('/:taskId/restart', middleware.ensureAuthenticated, async function(re
 });
 
 //  ------------- set task timeLog ----------------
-router.get('/:taskId/logTime', middleware.ensureAuthenticated, async function(req, res, next) {
-    let task_id = req.params.taskId;
+router.post('/:timeLogId/logTime', middleware.ensureAuthenticated, async function(req, res, next) {
+    let timeLogId = req.params.timeLogId;
     let data = req.body;
 
-    let task = await Tasks.findOne({
+    let timeLog = await Timetable.findOne({
         where: {
-            id: task_id
+            id: timeLogId
         }
     });
+    let task = await TasksHelper.getTask(timeLog.task_id);
 
     if (task.assignee !== req.user.id) {
         req.flash('error', `Task ${task.name} has not been assigned to you.`);
         return;
     }
 
-    let newRemainingTime = data.remainingTime;
-    await saveTimeLog(task.id, data.logDate, newRemainingTime, data.loggedTime, true);
-    let newLoggedTime = TasksHelper.getTaskLoggedTime(task);
+    timeLog.setAttributes({
+        remainingTime: data.remainingTime / 6,
+        loggedTime: data.loggedTime / 6,
+    });
+    await timeLog.save();
+
+    let taskLogs = await TasksHelper.getTaskLogs(task);
+    let currentLogDate = new Date(timeLog.logDate);
+    for (let i = 0; i < taskLogs.length; i++) {
+        let newLogDate = new Date(taskLogs[i].logDate);
+        if (newLogDate > currentLogDate) {
+            taskLogs[i].setAttributes({
+                remainingTime: data.remainingTime / 6
+            });
+            await taskLogs[i].save();
+        }
+    }
+
+    let newLoggedTime = await TasksHelper.getTaskLoggedTime(task);
 
     task.setAttributes({
         status: 2,
         workStart: null,
         loggedTime: newLoggedTime,
-        remainingTime: newRemainingTime
+        remainingTime: data.remainingTime
     });
 
     // validate task
@@ -508,49 +535,27 @@ let stopAutoTracking = async function(task){
     let todayDate = new Date();
     todayDate.setHours(0,0,0,0);
 
-    let timeDifference = (nowDate - startDate / 1000) / 3600;
+    let timeDifference = (nowDate.getTime() - startDate.getTime()) / 3600000;
     if (timeDifference < 0.016) {
         // manj kot minuta, damo na 0 (error)
         timeDifference = 0.0;
     }
     timeDifference = timeDifference / 6; // shranimo v točkah
 
-    return saveTimeLog(task.id, todayDate, timeDifference, timeDifference, false);
-};
+    let timeLog = await TasksHelper.getTaskDayLog(task, todayDate);
 
-let saveTimeLog = async function(taskId, todayDate, remainingTime, loggedTime, overwrite = false) {
-    let timeLogArray = await Timetable.findAll({
-        where: {
-            task_id: taskId,
-            logDate: todayDate
-        },
-        order: [
-            ['id', 'DESC']
-        ],
-    });
-    if (timeLogArray.length < 1) {
-
-    }
-    let timeLog = timeLogArray[timeLogArray.length - 1];
-
-    let remTime = 0.0;
-    let loggTime = 0.0;
-    if (overwrite) {
-        remTime = remainingTime;
-        loggTime = loggedTime;
-    } else {
-        remTime = Math.max(0.0, timeLog.remainingTime - remainingTime);
-        loggTime = timeLog.loggedTime + loggedTime;
+    if (!timeLog) {
+        return 0;
     }
 
     timeLog.setAttributes({
-        remainingTime: remTime,
-        loggedTime: loggTime,
+        remainingTime: Math.max(0.0, timeLog.remainingTime - timeDifference),
+        loggedTime: timeLog.loggedTime + timeDifference
     });
 
     await timeLog.save();
 
-    return remTime;
+    return Math.max(0.0, timeLog.remainingTime);
 };
 
 module.exports = router;
