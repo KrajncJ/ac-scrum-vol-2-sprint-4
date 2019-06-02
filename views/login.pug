@@ -16,8 +16,11 @@ html(lang='en').loginHtml
 
     body.loginBody
         .main.container#alignCenterLogin
-            .row#loginRow
+            .row#loginRow(style="margin-top: -200px")
                 .col-md-12.col-md-offset-0.vcenter
+                    center
+                        //img(src="/stylesheets/images/pride.png", style="width: 300px;margin-top: -50px;")
+
                     div.panel.panel-default
                         div.panel-heading
                             h3 AC scrum vol 2
@@ -40,6 +43,8 @@ html(lang='en').loginHtml
                                     .col-md-12.col-md-offset-0
                                         div.alert.alert-danger(role="alert")
                                             p Error - #{errorMessages}
+
+
 
 
         script(src='/javascripts/vendor/jquery-3.3.1.min.js')
