@@ -41,6 +41,8 @@ router.post('/', middleware.isAllowed, function (req, res, next) {
 });
 
 
+
+
 router.post('/edit_user/:id', middleware.isAllowed, async function (req, res, next) {
     var data = req.body;
 
@@ -92,14 +94,23 @@ router.post('/edit_user/:id', middleware.isAllowed, async function (req, res, ne
 });
 
 
-router.get('/edit/:id', middleware.isAllowed, async function(req, res, next) {
+router.get('/edit/me', middleware.ensureAuthenticated, async function (req, res, next) {
+  res.redirect(`/users/${req.user.id}/edita`);
+});
+
+
+router.get('/edit/:id', middleware.ensureAuthenticated, async function(req, res, next) {
+    if (req.user.id != req.params.id) {
+        res.redirect('/');
+    }
+
     let user = await User.findById(req.params.id);
     res.render('register', { errorMessages: 0, title: 'AC scrum vol2',
         pageName: 'admin_panel', user:user, username: req.user.username,
         isUser: req.user.is_user, uid: req.user.id, success: 0 });
 });
 
-router.post('/edit/:id', middleware.isAllowed, function (req, res, next) {
+router.post('/edit/:id', middleware.ensureAuthenticated, function (req, res, next) {
     var data = req.body;
     if (data.password !== data.password2) {
         req.flash('error', 'Passwords do not match.');

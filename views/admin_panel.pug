@@ -20,6 +20,18 @@ block content
                 hr
 
             div.main.container
+                if errorMessages
+                    .col-md-12.col-md-offset-0.margin-top20
+                        .alert.alert-danger(role="alert")
+                            h4.alert-heading Error.
+                            p #{errorMessages}
+
+                if successMessage
+                    .col-md-12.col-md-offset-0.margin-top20
+                        .alert.alert-success(role="alert")
+                            h4.alert-heading Success.
+                            p #{successMessage}
+
                 .card
                     .card-header#bg-theme
                         | System users
@@ -33,6 +45,7 @@ block content
                                     th(scope="col") Surname
                                     th(scope="col") E-mail
                                     th(scope="col") Role
+                                    th(scope="col") Manage
                                     //th Edit
                             tbody
                                 each user in users
@@ -43,9 +56,10 @@ block content
                                         td #{user.surname}
                                         td #{user.email}
                                         td #{user.is_user ? 'User' : 'Administrator'}
-                                        //td
-                                        //    a.btn.btn-primary(href="/users/" + user.id + "/details") Possible actions
+                                        td
+                                            a.btn.btn-primary.mr-2(href="/users/" + user.id + "/edita") Edit
 
-                                        //        i.fa.fa-arrow-left(aria-hidden='true' style="margin-left: 5px")
+                                            if thisUser.id !== user.id
+                                                a.btn.btn-danger(href="/users/" + user.id + "/remove") X
 
 

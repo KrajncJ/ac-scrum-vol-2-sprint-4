@@ -6,7 +6,7 @@ block content
         .container.theme-showcase
             .page-header
                 if user
-                    h3 Edit user
+                    h3 Edit your own user
                 if !user
                     h3 Register new user
 
@@ -26,6 +26,12 @@ block content
                             .alert.alert-danger(role="alert")
                                 h4.alert-heading #{errorMessages}
                                 p Something went wrong. Please check if your form is correct or if this username already exists - otherwise try later or contact application administrator.
+
+                    if success2 !== 0
+                        .col-md-12.col-md-offset-0.margin-top20
+                            .alert.alert-success(role="alert")
+                                h4.alert-heading Success.
+                                p #{success2}
 
                     if success !== 0
                         .col-md-12.col-md-offset-0.margin-top20

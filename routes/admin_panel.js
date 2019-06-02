@@ -15,7 +15,9 @@ router.get('/', middleware.isAllowed, async function(req, res, next) {
             pageName: 'admin_panel',
             username: req.user.username,
             isUser: req.user.is_user,
-            success: 0 });
+            thisUser: req.user,
+            success: 0
+        });
     }, function (err) {
         throw err;
     })
