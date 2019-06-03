@@ -134,9 +134,9 @@ block content
                                                                         .col-sm-1
                                                                             |
                                                                         .col-sm-3
-                                                                            | Logged time
+                                                                            | Logged time (h)
                                                                         .col-sm-4
-                                                                            | Remaining time
+                                                                            | Remaining time (h)
                                                                         .col-sm-2
                                                                             |
                                                                     each taskDay in acceptedTask.taskDays
@@ -170,7 +170,7 @@ block content
                                                                             h6.mb-1(style="color: black")
                                                                                 | #{activeTask.name} -
                                                                                 span(style="color: blue")  #{Math.round(activeTask.time * 6 * 2) / 2}h
-                                                                                | #{activeTask.loggedTime > 0.0 ? " [logged: " + (activeTask.loggedTime * 6).toFixed(2) + ", remaining: " + (activeTask.remainingTime * 6).toFixed(2) + "]" : ""}
+                                                                                | #{activeTask.loggedTime > 0.0 ? " [logged: " + (activeTask.loggedTime * 6).toFixed(2) + ", remaining: " + (activeTask.remainingTime).toFixed(2) + "]" : ""}
                                                                         p.mb-1(style="font-size:9pt")
                                                                             |  #{activeTask.description}
                                                                 div.col-sm-4
