@@ -103,7 +103,7 @@ block content
                                                                             h6.mb-1(style="color: black")
                                                                                 | #{acceptedTask.name} -
                                                                                 span(style="color: blue")  #{Math.round(acceptedTask.time * 6 * 2) / 2}h
-                                                                                | #{acceptedTask.loggedTime > 0.0 ? " [logged: " + (acceptedTask.loggedTime * 6).toFixed(2) + ", remaining: " + (acceptedTask.remainingTime * 6).toFixed(2) + "]" : ""}
+                                                                                | #{acceptedTask.loggedTime > 0.0 ? " [logged: " + (acceptedTask.loggedTime * 6).toFixed(2) + ", remaining: " + (acceptedTask.remainingTime).toFixed(2) + "]" : ""}
                                                                         p.mb-1(style="font-size:9pt")
                                                                             |  #{acceptedTask.description}
                                                                 div.col-sm-1
@@ -193,7 +193,7 @@ block content
                                                                             h6.mb-1(style="color: black")
                                                                                 | #{doneTask.name} -
                                                                                 span(style="color: blue")  #{Math.round(doneTask.time * 6 * 2) / 2}h
-                                                                                | #{doneTask.loggedTime > 0.0 ? " [logged: " + (doneTask.loggedTime * 6).toFixed(2) + ", remaining: " + (doneTask.remainingTime * 6).toFixed(2) + "]" : ""}
+                                                                                | #{doneTask.loggedTime > 0.0 ? " [logged: " + (doneTask.loggedTime * 6).toFixed(2) + ", remaining: " + (doneTask.remainingTime).toFixed(2) + "]" : ""}
                                                                         p.mb-1(style="font-size:9pt")
                                                                             | #{doneTask.description}
                                                                 div.col-sm-3
