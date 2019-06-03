@@ -18,8 +18,8 @@
    inkscape:version="0.91 r13725"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="/home/anze/Documents/sola1819/SMRPO/ac-scrum-vol-2-sprint-4/public/stylesheets/images/logo.png"
-   inkscape:export-xdpi="100"
-   inkscape:export-ydpi="100">
+   inkscape:export-xdpi="199.56438"
+   inkscape:export-ydpi="199.56438">
   <defs
      id="defs4">
     <clipPath
@@ -43,28 +43,6 @@
            y="774.90253"
            style="font-weight:normal;letter-spacing:0px"
            id="tspan4227-3" /></text>
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath4475">
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:63.68037796px;line-height:125%;font-family:'Lobster Two';-inkscape-font-specification:'Lobster Two';text-align:center;letter-spacing:85.28395844px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         x="301.78494"
-         y="991.5343"
-         id="text4477"
-         sodipodi:linespacing="125%"
-         transform="matrix(0,-1,1,0,0,0)"><tspan
-           sodipodi:role="line"
-           id="tspan4479"
-           x="301.78494"
-           y="991.5343"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Lobster Two';-inkscape-font-specification:'Lobster Two';letter-spacing:0px">AC scrum vol 2</tspan><tspan
-           sodipodi:role="line"
-           x="301.78494"
-           y="1071.1348"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Lobster Two';-inkscape-font-specification:'Lobster Two';letter-spacing:0px"
-           id="tspan4481" /></text>
     </clipPath>
     <clipPath
        clipPathUnits="userSpaceOnUse"
@@ -109,6 +87,28 @@
            x="329.06982"
            sodipodi:role="line" /></text>
     </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath4171">
+      <text
+         sodipodi:linespacing="125%"
+         id="text4173"
+         y="991.5343"
+         x="301.78494"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:63.68037796px;line-height:125%;font-family:'Lobster Two';-inkscape-font-specification:'Lobster Two';text-align:center;letter-spacing:85.28395844px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"
+         transform="matrix(0,-1,1,0,0,0)"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Lobster Two';-inkscape-font-specification:'Lobster Two';letter-spacing:0px"
+           y="991.5343"
+           x="301.78494"
+           id="tspan4175"
+           sodipodi:role="line">AC scrum vol 4</tspan><tspan
+           id="tspan4177"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Lobster Two';-inkscape-font-specification:'Lobster Two';letter-spacing:0px"
+           y="1071.1348"
+           x="301.78494"
+           sodipodi:role="line" /></text>
+    </clipPath>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -129,8 +129,8 @@
      fit-margin-bottom="0"
      inkscape:window-width="1504"
      inkscape:window-height="847"
-     inkscape:window-x="94"
-     inkscape:window-y="0"
+     inkscape:window-x="188"
+     inkscape:window-y="149"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
@@ -158,7 +158,7 @@
        height="355.85788"
        width="108.56075"
        transform="matrix(0,1,-1,0,0,0)"
-       clip-path="url(#clipPath4475)" />
+       clip-path="url(#clipPath4171)" />
     <image
        y="-411.91873"
        x="624.79065"
