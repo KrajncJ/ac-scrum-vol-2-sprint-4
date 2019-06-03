@@ -134,23 +134,24 @@ block content
                                                                         .col-sm-1
                                                                             |
                                                                         .col-sm-3
-                                                                            | Logged time
+                                                                            | Logged time (h)
                                                                         .col-sm-4
-                                                                            | Remaining time
+                                                                            | Remaining time (h)
                                                                         .col-sm-2
                                                                             |
                                                                     each taskDay in acceptedTask.taskDays
-                                                                        div.list-group-item.list-group-item-action
-                                                                            form(method='POST' action=('/tasks/'+ taskDay.id + '/logTime'))
-                                                                                .form-group.row.align-items-center(style="margin: 0px")
-                                                                                    .col-sm-4
-                                                                                        | #{taskDay.logDate}
-                                                                                    .col-sm-3
-                                                                                        input#loggedTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.loggedTime name='loggedTime' value=Math.round(taskDay.loggedTime * 6 * 2) / 2 )
-                                                                                    .col-sm-3
-                                                                                        input#remainingTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.remainingTime name='remainingTime' value=Math.round(taskDay.remainingTime * 6 * 2) / 2 )
-                                                                                    .col-sm-2
-                                                                                        button.btn.btn-primary(type='submit') Save
+                                                                        if moment(taskDay.logDate).isSameOrBefore(moment())
+                                                                            div.list-group-item.list-group-item-action
+                                                                                form(method='POST' action=('/tasks/'+ taskDay.id + '/logTime'))
+                                                                                    .form-group.row.align-items-center(style="margin: 0px")
+                                                                                        .col-sm-4
+                                                                                            | #{taskDay.logDate}
+                                                                                        .col-sm-3
+                                                                                            input#loggedTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.loggedTime name='loggedTime' value=Math.round(taskDay.loggedTime * 6 * 2) / 2 )
+                                                                                        .col-sm-3
+                                                                                            input#remainingTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.remainingTime name='remainingTime' value=Math.round(taskDay.remainingTime * 6 * 2) / 2 )
+                                                                                        .col-sm-2
+                                                                                            button.btn.btn-primary(type='submit') Save
 
                                             if (separator && myTasks.inProgress.length !== 0)
                                                 hr
@@ -169,7 +170,7 @@ block content
                                                                             h6.mb-1(style="color: black")
                                                                                 | #{activeTask.name} -
                                                                                 span(style="color: blue")  #{Math.round(activeTask.time * 6 * 2) / 2}h
-                                                                                | #{activeTask.loggedTime > 0.0 ? " [logged: " + (activeTask.loggedTime * 6).toFixed(2) + ", remaining: " + (activeTask.remainingTime * 6).toFixed(2) + "]" : ""}
+                                                                                | #{activeTask.loggedTime > 0.0 ? " [logged: " + (activeTask.loggedTime * 6).toFixed(2) + ", remaining: " + (activeTask.remainingTime).toFixed(2) + "]" : ""}
                                                                         p.mb-1(style="font-size:9pt")
                                                                             |  #{activeTask.description}
                                                                 div.col-sm-4
