@@ -140,17 +140,18 @@ block content
                                                                         .col-sm-2
                                                                             |
                                                                     each taskDay in acceptedTask.taskDays
-                                                                        div.list-group-item.list-group-item-action
-                                                                            form(method='POST' action=('/tasks/'+ taskDay.id + '/logTime'))
-                                                                                .form-group.row.align-items-center(style="margin: 0px")
-                                                                                    .col-sm-4
-                                                                                        | #{taskDay.logDate}
-                                                                                    .col-sm-3
-                                                                                        input#loggedTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.loggedTime name='loggedTime' value=Math.round(taskDay.loggedTime * 6 * 2) / 2 )
-                                                                                    .col-sm-3
-                                                                                        input#remainingTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.remainingTime name='remainingTime' value=Math.round(taskDay.remainingTime * 6 * 2) / 2 )
-                                                                                    .col-sm-2
-                                                                                        button.btn.btn-primary(type='submit') Save
+                                                                        if #{moment(taskDay.logDate).isSameOrBefore(moment())}
+                                                                            div.list-group-item.list-group-item-action
+                                                                                form(method='POST' action=('/tasks/'+ taskDay.id + '/logTime'))
+                                                                                    .form-group.row.align-items-center(style="margin: 0px")
+                                                                                        .col-sm-4
+                                                                                            | #{taskDay.logDate}
+                                                                                        .col-sm-3
+                                                                                            input#loggedTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.loggedTime name='loggedTime' value=Math.round(taskDay.loggedTime * 6 * 2) / 2 )
+                                                                                        .col-sm-3
+                                                                                            input#remainingTime.form-control(type='number' step="0.1" min="0.0" placeholder=taskDay.remainingTime name='remainingTime' value=Math.round(taskDay.remainingTime * 6 * 2) / 2 )
+                                                                                        .col-sm-2
+                                                                                            button.btn.btn-primary(type='submit') Save
 
                                             if (separator && myTasks.inProgress.length !== 0)
                                                 hr
