@@ -46,18 +46,18 @@ block content
                                                 div.form-group
                                                     label Date range
                                                     input.form-control#flatpickr-tryme(type='text' name="selected_date", placeholder="Start date to end date"
-                                                    value=(toEditSprint ? toEditSprint.startDate + ' to ' + toEditSprint.endDate : '') readonly)
+                                                    value=(toEditSprint ? toEditSprint.startDate + ' to ' + toEditSprint.endDate : '') readonly='')
                                                 div.form-group
                                                     label(for='velocity') Sprint velocity
                                                     input#velocity.form-control(name="velocity" type='number', placeholder='Sprint velocity'
-                                                    value=(toEditSprint ? toEditSprint.velocity : '') readonly)
+                                                    value=(toEditSprint ? toEditSprint.velocity : '') readonly='')
                                                 div.form-group
                                                     label(for='sprint_project') Sprint project
-                                                    select#sprint_project.form-control(name="sprint_project", placeholder='Sprint project' readonly)
+                                                    select#sprint_project.form-control(name="sprint_project", placeholder='Sprint project' readonly='')
                                                         option
                                                         each project in projects
                                                             if(toEditSprint)
-                                                                option(label=project.name selected=(toEditSprint.project_id===project.id)) #{project.id}
+                                                                option(label=project.name selected=(toEditSprint.project_id==project.id)) #{project.id}
                                                             else
                                                                 option(label=project.name) #{project.id}
                                             else
@@ -69,9 +69,10 @@ block content
                                                     label(for='velocity') Sprint velocity
                                                     input#velocity.form-control(name="velocity" type='number', placeholder='Sprint velocity'
                                                     value=(toEditSprint ? toEditSprint.velocity : ''))
+
                                                 div.form-group
                                                     label(for='sprint_project') Sprint project
-                                                    select#sprint_project.form-control(name="sprint_project", placeholder='Sprint project')
+                                                    select#sprint_project.form-control(name="sprint_project", placeholder='Sprint project' hidden)
                                                         option
                                                         each project in projects
                                                             if(toEditSprint)
@@ -116,7 +117,10 @@ block content
         }
 
         window.addEventListener('load', function () {
+           //$('#sprint_project').select2({disabled:true});
+
             $(document).ready(function ($) {
+
                 var start_date      = $("#start_date").text().replace("<","").replace(">","");
                 var end_date        = $("#end_date").text().replace("<","").replace(">","");
                 var sprint_id       = $("#sprint_id").text().replace("<", "").replace(">", "");
@@ -127,7 +131,7 @@ block content
                     var s_formated = moment(start_date, 'YYYY-MM-DD').format("DD.MM.YYYY");
                     flatpickr("#flatpickr-tryme", {
                         mode: "range",
-                        minDate: "today", //TODO: maybe to change
+                        //minDate: "today", //TODO: maybe to change
                         dateFormat: "d.m.Y",
                         defaultDate: [s_formated,e_formated]
                     });
