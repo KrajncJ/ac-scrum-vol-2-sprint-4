@@ -140,7 +140,7 @@ block content
                                                                         .col-sm-2
                                                                             |
                                                                     each taskDay in acceptedTask.taskDays
-                                                                        if #{moment(taskDay.logDate).isSameOrBefore(moment())}
+                                                                        if moment(taskDay.logDate).isSameOrBefore(moment())
                                                                             div.list-group-item.list-group-item-action
                                                                                 form(method='POST' action=('/tasks/'+ taskDay.id + '/logTime'))
                                                                                     .form-group.row.align-items-center(style="margin: 0px")
