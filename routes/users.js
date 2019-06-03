@@ -229,7 +229,7 @@ router.get('/:id/remove', middleware.ensureAuthenticated, async function (req, r
       })
     } else {
 
-      let is_deleted = !! await User.destroy();
+      let is_deleted = !! await user.destroy();
 
       if (is_deleted) {
         User.findAllUsers().then(function (users) { //true == users + admins
