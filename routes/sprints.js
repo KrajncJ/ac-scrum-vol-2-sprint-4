@@ -256,7 +256,33 @@ router.get('/:id/edit', SprintsHelper.isSM, async function(req, res, next) {
         currentSprint: currentSprint,
         toEditSprint: currentSprint,
         activeSprintId:activeSprintId,
+        only_stories: true,
     });
+});
+
+//  ------------- edit a sprint ----------------
+router.get('/:id/edit_stories', SprintsHelper.isSM, async function(req, res, next) {
+  let currentSprint  = await SprintsHelper.getSprint(req.params.id);
+  let currentProject = await ProjectHelper.getProject(currentSprint.project_id);
+  let projectStories = await StoriesHelper.listSelectableSprintStories(currentProject.id,currentSprint.id);
+  let activeSprintId = await SprintsHelper.currentActiveSprint(currentProject.id);
+  let selected_sprint_date =   moment(currentSprint.startDate,'YYYY-MM-DD').format("DD.MM.YYYY") + " to " + moment(currentSprint.endDate,'YYYY-MM-DD').format("DD.MM.YYYY");
+
+  res.render('add_edit_sprint', {
+    errorMessages: 0,
+    success: 0,
+    pageName: 'projects',
+    projects: ad_sm_projects,
+    stories: projectStories,
+    uid: req.user.id,
+    username: req.user.username,
+    selected_sprint_date: selected_sprint_date,
+    isUser: req.user.is_user,
+    currentSprint: currentSprint,
+    toEditSprint: currentSprint,
+    activeSprintId:activeSprintId,
+    only_stories: true,
+  });
 });
 
 router.post('/:id/edit/', SprintsHelper.isSM, async function(req, res, next) {

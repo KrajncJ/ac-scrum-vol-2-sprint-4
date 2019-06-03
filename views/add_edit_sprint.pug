@@ -42,23 +42,43 @@ block content
                                 form.well.form-horizontal(method='POST' action=(toEditSprint ? '/sprints/'+ toEditSprint.id + '/edit/' : '/sprints/create'))#sprint_form
                                     div.panel-body
                                         div.col-md-12.col-md-offset-0
-                                            div.form-group
-                                                label Date range
-                                                input.form-control#flatpickr-tryme(type='text' name="selected_date", placeholder="Start date to end date"
-                                                value=(toEditSprint ? toEditSprint.startDate + ' to ' + toEditSprint.endDate : ''))
-                                            div.form-group
-                                                label(for='velocity') Sprint velocity
-                                                input#velocity.form-control(name="velocity" type='number', placeholder='Sprint velocity'
-                                                value=(toEditSprint ? toEditSprint.velocity : ''))
-                                            div.form-group
-                                                label(for='sprint_project') Sprint project
-                                                select#sprint_project.form-control(name="sprint_project", placeholder='Sprint project')
-                                                    option
-                                                    each project in projects
-                                                        if(toEditSprint)
-                                                            option(label=project.name selected=(toEditSprint.project_id===project.id)) #{project.id}
-                                                        else
-                                                            option(label=project.name) #{project.id}
+                                            if only_stories
+                                                div.form-group
+                                                    label Date range
+                                                    input.form-control#flatpickr-tryme(type='text' name="selected_date", placeholder="Start date to end date"
+                                                    value=(toEditSprint ? toEditSprint.startDate + ' to ' + toEditSprint.endDate : '') readonly)
+                                                div.form-group
+                                                    label(for='velocity') Sprint velocity
+                                                    input#velocity.form-control(name="velocity" type='number', placeholder='Sprint velocity'
+                                                    value=(toEditSprint ? toEditSprint.velocity : '') readonly)
+                                                div.form-group
+                                                    label(for='sprint_project') Sprint project
+                                                    select#sprint_project.form-control(name="sprint_project", placeholder='Sprint project' readonly)
+                                                        option
+                                                        each project in projects
+                                                            if(toEditSprint)
+                                                                option(label=project.name selected=(toEditSprint.project_id===project.id)) #{project.id}
+                                                            else
+                                                                option(label=project.name) #{project.id}
+                                            else
+                                                div.form-group
+                                                    label Date range
+                                                    input.form-control#flatpickr-tryme(type='text' name="selected_date", placeholder="Start date to end date"
+                                                    value=(toEditSprint ? toEditSprint.startDate + ' to ' + toEditSprint.endDate : ''))
+                                                div.form-group
+                                                    label(for='velocity') Sprint velocity
+                                                    input#velocity.form-control(name="velocity" type='number', placeholder='Sprint velocity'
+                                                    value=(toEditSprint ? toEditSprint.velocity : ''))
+                                                div.form-group
+                                                    label(for='sprint_project') Sprint project
+                                                    select#sprint_project.form-control(name="sprint_project", placeholder='Sprint project')
+                                                        option
+                                                        each project in projects
+                                                            if(toEditSprint)
+                                                                option(label=project.name selected=(toEditSprint.project_id === project.id)) #{project.id}
+                                                            else
+                                                                option(label=project.name) #{project.id}
+
                                             div.form-group
                                                 label Sprint stories
                                                 select#sprint_stories.form-control(name='stories', multiple='multiple' placeholder='Sprint stories')

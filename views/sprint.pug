@@ -25,6 +25,10 @@ block content
                                                 a.nav-link(href='/sprints/' + currentSprint.id + '/edit') Edit Sprint
                                             li.nav-item
                                                 a.nav-link(href='/sprints/' + currentSprint.id + '/remove') Remove Sprint
+                                        else
+                                            li.nav-item
+                                                a.nav-link(href='/sprints/' + currentSprint.id + '/edit_stories') Edit Sprint
+
 
 
                 hr
@@ -62,7 +66,7 @@ block content
                                                 input.form-control(name="velocity" placeholder='Sprint velocity' readonly='' value=currentSprint.velocity)
                                             div.form-group
                                                 label Sprint project
-                                                input.form-control(type='text' name="sprint_project" placeholder='Sprint project' value=project.name readonly='')
+                                                input.form-control(type='text' name="sprint_project" placeholder='Sprint project' value=project.name readonly='' )
                                             div.form-group
                                                 if(toEditSprint)
                                                     label Sprint stories
